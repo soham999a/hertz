@@ -8,6 +8,7 @@ import { RegionTabs } from '@/components/RegionTabs';
 import { StationGrid } from '@/components/StationGrid';
 import { REGIONS } from '@/types/radio';
 import { usePlayer } from '@/contexts/PlayerContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { RadioStation } from '@/types/radio';
 
 const Index = () => {
@@ -16,6 +17,7 @@ const Index = () => {
   const [showAllNotable, setShowAllNotable] = useState(false);
   const region = REGIONS.find(r => r.id === selectedRegion);
   const { play, currentStation, isPlaying } = usePlayer();
+  const { isPremium } = useAuth();
 
   // Station icons mapping
   const stationIcons: Record<string, any> = {
@@ -531,7 +533,7 @@ const Index = () => {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-grid-texture overflow-hidden">
+      <section className="relative bg-grid-texture">
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-background/0 via-background/60 to-background pointer-events-none" />
 
@@ -667,6 +669,27 @@ const Index = () => {
         {/* Divider */}
         <div className="gold-bar my-8" />
 
+        {/* Ad Banner - Only for Free Users */}
+        {!isPremium && (
+          <motion.section
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.25 }}
+            className="mb-8"
+          >
+            <div className="relative overflow-hidden rounded-xl border border-border bg-gradient-to-br from-secondary/80 to-secondary/40 p-6 text-center">
+              <div className="absolute inset-0 bg-grid-texture opacity-5" />
+              <div className="relative">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-2">Advertisement</p>
+                <div className="bg-muted/30 rounded-lg p-8 border border-border/50">
+                  <p className="text-sm text-muted-foreground mb-2">Your ad could be here</p>
+                  <p className="text-xs text-muted-foreground/70">Support us by upgrading to Premium</p>
+                </div>
+              </div>
+            </div>
+          </motion.section>
+        )}
+
         {/* Other Notable Stations Section */}
         <motion.section
           initial={{ opacity: 0 }}
@@ -724,33 +747,35 @@ const Index = () => {
           )}
         </motion.section>
 
-        {/* Premium CTA */}
-        <motion.section
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mt-10 mb-4 relative overflow-hidden rounded-2xl border border-primary/20 bg-card"
-        >
-          {/* Gold stripe top */}
-          <div className="h-0.5 bg-gradient-primary w-full" />
-          <div className="p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-primary" />
+        {/* Premium CTA - Only for Free Users */}
+        {!isPremium && (
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="mt-10 mb-4 relative overflow-hidden rounded-2xl border border-primary/20 bg-card"
+          >
+            {/* Gold stripe top */}
+            <div className="h-0.5 bg-gradient-primary w-full" />
+            <div className="p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-display text-sm font-bold text-foreground">Go Premium</h3>
+                  <p className="text-[11px] text-muted-foreground">HD audio · No ads · Exclusive regions</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-display text-sm font-bold text-foreground">Go Premium</h3>
-                <p className="text-[11px] text-muted-foreground">HD audio · No ads · Exclusive regions</p>
-              </div>
+              <a
+                href="/premium"
+                className="block w-full text-center py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-all hover:opacity-90 active:scale-98"
+              >
+                Explore Premium Plans
+              </a>
             </div>
-            <a
-              href="/premium"
-              className="block w-full text-center py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-sm transition-all hover:opacity-90 active:scale-98"
-            >
-              Explore Premium Plans
-            </a>
-          </div>
-        </motion.section>
+          </motion.section>
+        )}
       </main>
 
       <AudioPlayer />

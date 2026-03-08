@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import {
   Crown, Check, Zap, Globe, Headphones, Star,
   Shield, Wifi, Download, Music2, Radio, ChevronRight
@@ -84,8 +83,20 @@ const regions = [
 ];
 
 export default function Premium() {
-  const { isPremium, user } = useAuth();
+  const { isPremium, user, loading } = useAuth();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  // Show loading state while auth is initializing
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background pb-28 flex items-center justify-center">
+        <div className="text-center">
+          <Crown className="w-12 h-12 text-primary mx-auto mb-4 animate-pulse" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleCheckout = async (planId: string) => {
     if (!user) {
@@ -144,14 +155,15 @@ export default function Premium() {
 
   if (isPremium) {
     return (
-      <div className="min-h-screen bg-background pb-28 flex flex-col items-center justify-center text-center px-4">
+      <div className="min-h-screen bg-background pb-28">
         <Header />
-        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
+        <div className="flex flex-col items-center justify-center text-center px-4 pt-20">
           <Crown className="w-16 h-16 text-primary mx-auto mb-4" />
           <h1 className="font-display text-3xl font-bold text-foreground mb-2">Premium Unlocked!</h1>
           <p className="text-muted-foreground mb-6">You have full access to all features. Refresh the app to verify.</p>
           <Button onClick={() => window.location.href = '/'}>Return to Home</Button>
-        </motion.div>
+        </div>
+        <AudioPlayer />
       </div>
     );
   }
@@ -161,10 +173,10 @@ export default function Premium() {
       <Header />
 
       {/* Hero */}
-      <section className="relative bg-grid-texture overflow-hidden">
+      <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-background/0 via-background/50 to-background pointer-events-none" />
         <div className="relative max-w-2xl mx-auto px-4 pt-10 pb-8 text-center">
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+          <div>
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/30 bg-primary/10 mb-5">
               <Crown className="w-3.5 h-3.5 text-primary" />
               <span className="text-[11px] font-bold text-primary uppercase tracking-widest">Frequency House Premium</span>
@@ -178,20 +190,13 @@ export default function Premium() {
             <p className="text-sm text-muted-foreground max-w-xs mx-auto">
               No ads. HD audio. Every region on Earth. <b>Free for first 60 days</b> - no card details required!
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       <main className="max-w-2xl mx-auto px-4">
-        {/* Gold divider */}
-        <div className="gold-bar mb-8" />
-
         {/* Pricing Info Banner */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-6 p-4 rounded-xl bg-gradient-to-r from-primary/10 to-amber-500/10 border border-primary/20"
-        >
+        <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-primary/10 to-amber-500/10 border border-primary/20">
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
               <Crown className="w-4 h-4 text-primary" />
@@ -203,27 +208,19 @@ export default function Premium() {
               </p>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Pricing Cards */}
-        <motion.section
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-8"
-        >
+        <section className="mb-8">
           <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-3">Choose your plan</p>
           <div className="flex flex-col gap-3">
-            {plans.map((plan, i) => (
-              <motion.div
+            {plans.map((plan) => (
+              <div
                 key={plan.id}
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.15 + i * 0.1 }}
                 className={cn(
                   "relative rounded-2xl border p-5 transition-all",
                   plan.popular
-                    ? "border-primary bg-primary/8 glow-primary"
+                    ? "border-primary bg-primary/8"
                     : "border-border bg-card"
                 )}
               >
@@ -246,13 +243,13 @@ export default function Premium() {
                   </div>
 
                   <div className="text-right">
-                    {plan.savings && (
+                    {plan.savings && !plan.comingSoon && (
                       <span className="inline-block mb-2 px-2 py-0.5 rounded-full bg-primary/15 text-primary text-[10px] font-bold">
                         {plan.savings}
                       </span>
                     )}
                     {plan.comingSoon ? (
-                      <div className="text-[10px] text-muted-foreground font-medium">
+                      <div className="text-[10px] text-muted-foreground font-medium px-4 py-2 rounded-lg bg-secondary/50">
                         Available after trial
                       </div>
                     ) : (
@@ -260,11 +257,16 @@ export default function Premium() {
                         size="sm"
                         variant={plan.popular ? 'default' : 'outline'}
                         className={cn(
-                          "text-xs font-semibold",
-                          plan.popular && "glow-primary",
-                          plan.id === 'free' && "opacity-50 pointer-events-none"
+                          "text-xs font-semibold cursor-pointer",
+                          plan.popular && "shadow-lg",
+                          plan.id === 'free' && "opacity-50 cursor-not-allowed"
                         )}
-                        onClick={() => plan.id !== 'free' && handleCheckout(plan.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (plan.id !== 'free' && !isCheckingOut) {
+                            handleCheckout(plan.id);
+                          }
+                        }}
                         disabled={plan.id === 'free' || isCheckingOut}
                       >
                         {isCheckingOut ? 'Loading...' : plan.cta}
@@ -272,22 +274,17 @@ export default function Premium() {
                     )}
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
 
           <p className="text-center text-[11px] text-muted-foreground mt-3">
             ✓ 60 days free trial &nbsp;·&nbsp; ✓ Then $1/month or $12/year &nbsp;·&nbsp; ✓ Cancel anytime
           </p>
-        </motion.section>
+        </section>
 
         {/* Free vs Premium comparison */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.25 }}
-          className="mb-8"
-        >
+        <section className="mb-8">
           <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-3">Free vs Premium</p>
           <div className="rounded-2xl border border-border bg-card overflow-hidden">
             {/* Header row */}
@@ -322,23 +319,15 @@ export default function Premium() {
               </div>
             ))}
           </div>
-        </motion.section>
+        </section>
 
         {/* Premium Features */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mb-8"
-        >
+        <section className="mb-8">
           <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-3">What you get</p>
           <div className="grid grid-cols-1 gap-2">
-            {premiumFeatures.map((f, i) => (
-              <motion.div
+            {premiumFeatures.map((f) => (
+              <div
                 key={f.text}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.35 + i * 0.05 }}
                 className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border"
               >
                 <div className="w-8 h-8 rounded-lg bg-primary/12 flex items-center justify-center flex-shrink-0">
@@ -346,21 +335,16 @@ export default function Premium() {
                 </div>
                 <span className="text-sm text-foreground">{f.text}</span>
                 <Check className="w-4 h-4 text-primary ml-auto flex-shrink-0" />
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.section>
+        </section>
 
         {/* Regions Preview */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="mb-8"
-        >
+        <section className="mb-8">
           <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-3">Stations & Regions</p>
           <div className="flex flex-col gap-2">
-            {regions.map((r, i) => (
+            {regions.map((r) => (
               <div
                 key={r.name}
                 className={cn(
@@ -389,15 +373,10 @@ export default function Premium() {
               </div>
             ))}
           </div>
-        </motion.section>
+        </section>
 
         {/* CTA bottom */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="pb-4"
-        >
+        <div className="pb-4">
           <div className="rounded-2xl border border-primary/20 bg-card overflow-hidden">
             <div className="h-0.5 bg-gradient-primary" />
             <div className="p-5 text-center">
@@ -405,7 +384,7 @@ export default function Premium() {
               <h3 className="font-display text-base font-bold text-foreground mb-1">Start Your Free Trial</h3>
               <p className="text-xs text-muted-foreground mb-4">Get 60 days of Pro features absolutely free. After trial: $1/month or $12/year.</p>
               <Button
-                className="w-full glow-primary font-semibold"
+                className="w-full font-semibold"
                 onClick={() => handleCheckout('premium_trial')}
                 disabled={isCheckingOut}
               >
@@ -414,7 +393,7 @@ export default function Premium() {
               <p className="text-[10px] text-muted-foreground mt-2.5">No credit card required • Cancel anytime</p>
             </div>
           </div>
-        </motion.div>
+        </div>
       </main>
 
       <AudioPlayer />
