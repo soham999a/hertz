@@ -14,7 +14,6 @@ import { RadioStation } from '@/types/radio';
 const Index = () => {
   const [selectedRegion, setSelectedRegion] = useState('india');
   const [showAllEditorsPicks, setShowAllEditorsPicks] = useState(false);
-  const [showAllNotable, setShowAllNotable] = useState(false);
   const region = REGIONS.find(r => r.id === selectedRegion);
   const { play, currentStation, isPlaying } = usePlayer();
   const { isPremium } = useAuth();
@@ -690,62 +689,7 @@ const Index = () => {
           </motion.section>
         )}
 
-        {/* Other Notable Stations Section */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mb-8"
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-xl">🎵</span>
-            <h2 className="font-display text-lg font-bold text-foreground">
-              Other Notable Stations
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {notableStations.slice(0, showAllNotable ? notableStations.length : 8).map((station) => {
-              const isCurrentlyPlaying = currentStation?.id === station.id && isPlaying;
-              const StationIcon = stationIcons[station.id] || Radio;
-              return (
-                <div
-                  key={station.id}
-                  onClick={() => handleStationClick(station)}
-                  className="p-3 rounded-xl border border-border bg-card hover:bg-accent/50 transition-all cursor-pointer group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
-                      isCurrentlyPlaying 
-                        ? 'bg-primary text-primary-foreground animate-pulse' 
-                        : 'bg-secondary group-hover:bg-primary/20'
-                    }`}>
-                      <StationIcon className={`w-5 h-5 ${isCurrentlyPlaying ? 'text-primary-foreground' : 'text-primary'}`} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-xs text-foreground truncate">{station.name}</h3>
-                      <p className="text-[10px] text-muted-foreground truncate">{station.tags.split(',')[0]}</p>
-                    </div>
-                    {isCurrentlyPlaying && (
-                      <div className="flex gap-0.5 flex-shrink-0">
-                        <div className="w-0.5 h-3 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0ms' }} />
-                        <div className="w-0.5 h-3 bg-primary rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
-                        <div className="w-0.5 h-3 bg-primary rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          {notableStations.length > 8 && (
-            <button
-              onClick={() => setShowAllNotable(!showAllNotable)}
-              className="mt-3 w-full py-2 rounded-lg border border-border bg-secondary/50 hover:bg-secondary text-xs font-medium text-foreground transition-colors"
-            >
-              {showAllNotable ? 'Show Less' : `Show ${notableStations.length - 8} More`}
-            </button>
-          )}
-        </motion.section>
+        {/* Other Notable Stations section removed per request */}
 
         {/* Premium CTA - Only for Free Users */}
         {!isPremium && (
