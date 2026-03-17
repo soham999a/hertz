@@ -17,7 +17,7 @@ export function useFavorites() {
   const [isPremium, setIsPremium] = useState(false);
 
   // Function to check premium status
-  const checkPremiumStatus = useCallback((uid: string | null, session: any) => {
+  const checkPremiumStatus = useCallback((uid: string | null, session: { user?: { user_metadata?: { is_premium?: boolean } } } | null) => {
     if (!uid) return false;
     
     // Check localStorage first (most reliable)

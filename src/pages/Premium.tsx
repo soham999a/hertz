@@ -132,7 +132,7 @@ export default function Premium() {
       setTimeout(() => {
         window.location.href = '/';
       }, 1500);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Activation error:", err);
       // Still try localStorage fallback
       try {
@@ -144,8 +144,9 @@ export default function Premium() {
           window.location.href = '/';
         }, 1500);
       } catch {
+        const message = err instanceof Error ? err.message : 'Please try again later';
         toast.error('Failed to activate Premium', {
-          description: err.message || 'Please try again later'
+          description: message
         });
       }
     } finally {

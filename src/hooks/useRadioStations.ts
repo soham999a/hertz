@@ -4,13 +4,22 @@ import { RadioStation, REGIONS, CURATED_STATIONS } from '@/types/radio';
 const RADIO_BROWSER_API = 'https://de1.api.radio-browser.info/json';
 
 // Transform API response to ensure we have proper url
-function transformStation(station: any): RadioStation {
+function transformStation(station: Record<string, unknown>): RadioStation {
   return {
-    ...station,
-    id: station.stationuuid || station.id,
-    // Use url_resolved if available, fallback to url
-    url: station.url_resolved || station.url,
-    url_resolved: station.url_resolved || station.url,
+    id: String(station.stationuuid || station.id || ''),
+    stationuuid: String(station.stationuuid || ''),
+    name: String(station.name || ''),
+    url: String(station.url_resolved || station.url || ''),
+    url_resolved: String(station.url_resolved || station.url || ''),
+    favicon: String(station.favicon || ''),
+    country: String(station.country || ''),
+    countrycode: String(station.countrycode || ''),
+    language: String(station.language || ''),
+    tags: String(station.tags || ''),
+    votes: Number(station.votes || 0),
+    codec: String(station.codec || ''),
+    bitrate: Number(station.bitrate || 0),
+    homepage: String(station.homepage || ''),
   };
 }
 

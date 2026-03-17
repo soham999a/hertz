@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Radio, Sparkles, Music2, Disc3, Headphones, Mic2, Globe2, Waves, Zap, Film, Music } from 'lucide-react';
 import { Header } from '@/components/Header';
@@ -22,7 +23,7 @@ const Index = () => {
 
 
   // Station icons mapping
-  const stationIcons: Record<string, any> = {
+  const stationIcons: Record<string, React.ElementType> = {
     'kexp': Radio,
     'nts': Disc3,
     'worldwide': Globe2,

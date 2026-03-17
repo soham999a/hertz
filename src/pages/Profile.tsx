@@ -8,6 +8,23 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { User, Mail, Phone, MapPin, Calendar, LogOut } from 'lucide-react';
 
+interface ListenEntry {
+  id: string;
+  name: string;
+  count: number;
+  last: number;
+}
+
+interface UserMetadata {
+  display_name?: string;
+  customer_name?: string;
+  phone_number?: string;
+  location?: string;
+  bio?: string;
+  avatar_base64?: string;
+  avatar_url?: string;
+}
+
 export default function Profile() {
   const { user, signOut } = useAuth();
   const [displayName, setDisplayName] = useState<string>('');
@@ -17,11 +34,11 @@ export default function Profile() {
   const [bio, setBio] = useState<string>('');
   const [avatarData, setAvatarData] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [listens, setListens] = useState<Record<string, any>>({});
+  const [listens, setListens] = useState<Record<string, ListenEntry>>({});
 
   useEffect(() => {
     if (!user) return;
-    const md = (user.user_metadata ?? {}) as any;
+    const md = (user.user_metadata ?? {}) as UserMetadata;
     setDisplayName(md.display_name || '');
     setCustomerName(md.customer_name || '');
     setPhoneNumber(md.phone_number || '');
@@ -65,16 +82,17 @@ export default function Profile() {
       });
       if (error) throw error;
       alert('Profile updated successfully!');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      alert(err?.message || 'Failed to update profile');
+      const message = err instanceof Error ? err.message : 'Failed to update profile';
+      alert(message);
     } finally {
       setLoading(false);
     }
   };
 
   const topListens = Object.values(listens)
-    .sort((a: any, b: any) => (b.count || 0) - (a.count || 0))
+    .sort((a: ListenEntry, b: ListenEntry) => (b.count || 0) - (a.count || 0))
     .slice(0, 8);
 
   return (
@@ -245,7 +263,7 @@ export default function Profile() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {topListens.map((l: any, i: number) => (
+                  {topListens.map((l: ListenEntry, i: number) => (
                     <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
