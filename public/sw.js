@@ -1,5 +1,5 @@
 // Service Worker for Frequency House
-const CACHE_NAME = 'frequency-house-v1';
+const CACHE_NAME = 'frequency-house-v3';
 const OFFLINE_URL = '/offline.html';
 
 // Assets to cache on install
